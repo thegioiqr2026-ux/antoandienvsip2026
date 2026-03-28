@@ -1,175 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AN TOÀN ĐIỆN VSIP 2026</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" href="data:,">
-    <style>
-        body { background: #f4f7f9; padding: 10px; font-family: sans-serif; }
-        .card { border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
-        .header { background: #004a99; color: white; padding: 20px; text-align: center; border-radius: 12px 12px 0 0; }
-        .btn-primary { background: #004a99; border: none; padding: 12px; font-weight: bold; }
-        .found-box { background: #e8f5e9; border: 1px solid #2e7d32; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: none; }
-        #spin { display: none; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="card mt-3">
-        <div class="header">
-            <h5 class="mb-0">THÔNG TIN HỌC VIÊN AN TOÀN ĐIỆN VSIP 2026</h5>
-        </div>
-        <div class="card-body p-4">
-            <div id="foundMsg" class="found-box text-success small">✓ Đã khớp dữ liệu. Phòng và Bậc đã được điền tự động.</div>
-            
-            <form id="studentForm">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Họ và Tên (Viết HOA)</label>
-                    <div class="input-group">
-                        <input type="text" id="fullName" class="form-control text-uppercase" placeholder="NGUYỄN VĂN A" required onblur="lookupName()">
-                        <span id="spin" class="spinner-border spinner-border-sm text-primary m-2"></span>
-                    </div>
-                </div>
+function lookupName() {
+  const name = document.getElementById('fullName').value.trim();
+  if (!name) return;
+  
+  document.getElementById('spin').style.display = 'inline-block';
 
-                <div class="row">
-                    <div class="col-6 mb-3">
-                        <label class="form-label fw-bold">Bộ phận</label>
-                        <select id="dept" class="form-select" required>
-                            <option value="">--Chọn--</option>
-                            <option value="M&E">M&E</option><option value="PP">PP</option>
-                            <option value="W&S">W&S</option><option value="EMD">EMD</option>
-                            <option value="CON">CON</option><option value="SHEC">SHEC</option>
-                        </select>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label fw-bold">Phòng</label>
-                        <input type="text" id="room" class="form-control" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-6 mb-3">
-                        <label class="form-label fw-bold">Bậc</label>
-                        <select id="level" class="form-select" required>
-                            <option value="">--Chọn--</option>
-                            <option value="1/5">1/5</option><option value="2/5">2/5</option>
-                            <option value="3/5">3/5</option><option value="4/5">4/5</option>
-                            <option value="5/5">5/5</option>
-                        </select>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label fw-bold">Ngày sinh</label>
-                        <input type="date" id="dob" class="form-control" required>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Số CMND/CCCD</label>
-                    <input type="text" id="idCard" class="form-control" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Chức vụ/ Công việc</label>
-                    <input type="text" id="job" class="form-control" required>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-danger">Hình thẻ 3x4 (Dạng file ảnh)</label>
-                    <input type="file" id="photo" accept="image/*" class="form-control" required>
-                </div>
-
-                <button type="button" onclick="sendData()" id="btn" class="btn btn-primary w-100 shadow">GỬI THÔNG TIN VỀ VDC</button>
-            </form>
-            <div id="status" class="mt-3 text-center fw-bold"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // DÁN LINK WEB APP MỚI CỦA BẠN VÀO ĐÂY
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz_WiyNUAcAo1O2lj4ITS5mcWFRkNEeYU6gC9n1YKf2l4O58hL-uhIThF2Mi1nZh2njkg/exec";
-
-    let studentInfo = { isUpdate: false, row: null };
-
-    async function lookupName() {
-        const name = document.getElementById('fullName').value.trim();
-        if (!name) return;
-        document.getElementById('spin').style.display = 'block';
-
-        try {
-            const response = await fetch(WEB_APP_URL + "?action=lookup&fullName=" + encodeURIComponent(name));
-            const res = await response.json();
-
-            document.getElementById('spin').style.display = 'none';
-            if (res.exists) {
-                studentInfo = { isUpdate: true, row: res.row };
-                document.getElementById('foundMsg').style.display = 'block';
-                document.getElementById('room').value = res.room || "";
-                document.getElementById('level').value = res.level || "";
-                document.getElementById('status').innerText = "";
-            } else {
-                studentInfo = { isUpdate: false, row: null };
-                document.getElementById('foundMsg').style.display = 'none';
-                if (!confirm("Họ tên này không có trong danh sách. Bạn có chắc chắn nhập đúng không?")) {
-                    document.getElementById('fullName').value = "";
-                }
-            }
-        } catch (e) {
-            document.getElementById('spin').style.display = 'none';
-            console.error(e);
-        }
+  // Tạo lời gọi JSONP
+  const script = document.createElement('script');
+  const callbackName = 'vdcCallback_' + Math.round(Math.random() * 1000000);
+  
+  window[callbackName] = function(res) {
+    document.getElementById('spin').style.display = 'none';
+    if (res.exists) {
+      studentInfo = { isUpdate: true, row: res.row };
+      document.getElementById('foundMsg').style.display = 'block';
+      document.getElementById('room').value = res.room || "";
+      document.getElementById('level').value = res.level || "";
+    } else {
+      studentInfo = { isUpdate: false, row: null };
+      document.getElementById('foundMsg').style.display = 'none';
+      if (!confirm("Họ tên này không có trong danh sách. Bạn xác nhận nhập đúng?")) {
+        document.getElementById('fullName').value = "";
+      }
     }
+    document.body.removeChild(script);
+    delete window[callbackName];
+  };
 
-    function sendData() {
-        const fileInput = document.getElementById('photo');
-        const file = fileInput.files[0];
-        if (!file) { alert("Vui lòng chọn ảnh!"); return; }
-
-        const btn = document.getElementById('btn');
-        const status = document.getElementById('status');
-        btn.disabled = true;
-        status.innerHTML = "<span class='text-primary'>Đang tải dữ liệu và ảnh lên hệ thống...</span>";
-
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            const payload = {
-                fullName: document.getElementById('fullName').value.toUpperCase(),
-                department: document.getElementById('dept').value,
-                room: document.getElementById('room').value,
-                level: document.getElementById('level').value,
-                dob: document.getElementById('dob').value,
-                idCard: document.getElementById('idCard').value,
-                jobTitle: document.getElementById('job').value,
-                image: e.target.result,
-                isUpdate: studentInfo.isUpdate,
-                rowNumber: studentInfo.row
-            };
-
-            try {
-                // Gửi dữ liệu bằng POST
-                const response = await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors", // Quan trọng để tránh lỗi CORS khi chạy từ GitHub
-                    cache: "no-cache",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                // Do dùng no-cors nên không đọc được response trả về, 
-                // nhưng dữ liệu vẫn được gửi lên thành công.
-                status.innerHTML = "<span class='text-success'>Gửi dữ liệu thành công! Cảm ơn bạn.</span>";
-                document.getElementById('studentForm').reset();
-                document.getElementById('foundMsg').style.display = 'none';
-            } catch (error) {
-                status.innerHTML = "<span class='text-danger'>Có lỗi xảy ra khi gửi dữ liệu.</span>";
-                console.error(error);
-            }
-            btn.disabled = false;
-        };
-        reader.readAsDataURL(file);
-    }
-</script>
-</body>
-</html>
+  script.src = `${WEB_APP_URL}?action=lookup&fullName=${encodeURIComponent(name)}&callback=${callbackName}`;
+  document.body.appendChild(script);
+}
