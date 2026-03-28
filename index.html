@@ -11,32 +11,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { background: #f4f6f9; padding: 10px; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        .container { max-width: 500px; padding: 0; }
-        .card { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }
-        .header-box { background: #004085; color: white; padding: 20px; text-align: center; }
-        .header-box h5 { font-weight: bold; text-transform: uppercase; margin: 0; font-size: 1.1rem; line-height: 1.4; }
+        body { background: #f8f9fa; padding: 10px; font-family: 'Segoe UI', sans-serif; }
+        .container { max-width: 450px; padding: 0; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header-box { background: #004085; color: white; padding: 20px; text-align: center; border-radius: 15px 15px 0 0; }
+        .header-box h5 { font-weight: bold; text-transform: uppercase; margin: 0; font-size: 1rem; }
         
-        .form-label { font-weight: 600; color: #444; margin-top: 10px; font-size: 0.95rem; }
-        .form-control, .form-select { padding: 12px; border-radius: 10px; border: 1px solid #ced4da; }
+        /* Giao diện mỗi thông tin 1 dòng */
+        .form-group { margin-bottom: 15px; }
+        .form-label { font-weight: 600; color: #333; margin-bottom: 5px; display: block; font-size: 0.9rem; }
+        .form-control, .form-select { padding: 12px; border-radius: 8px; border: 1px solid #ddd; width: 100%; }
         
-        /* Nút chọn ảnh kiểu Modern */
-        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
-        .btn-file { 
-            background: #fff; border: 2px dashed #004085; color: #004085; 
-            padding: 15px; border-radius: 10px; width: 100%; text-align: center; font-weight: bold;
+        /* Tách biệt nút Chụp và Chọn */
+        .photo-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-photo { 
+            flex: 1; padding: 12px 5px; border-radius: 8px; font-weight: bold; font-size: 0.85rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+            border: 2px solid #004085; transition: 0.2s;
         }
-        .btn-file i { font-size: 1.5rem; display: block; margin-bottom: 5px; }
-        
+        .btn-capture { background: #004085; color: white; }
+        .btn-browse { background: white; color: #004085; }
+        .btn-photo:active { transform: scale(0.95); opacity: 0.8; }
+
         /* Xem trước ảnh */
-        #previewContainer { display: none; text-align: center; margin-top: 15px; padding: 10px; background: #fff; border-radius: 10px; }
-        #imagePreview { width: 120px; height: 160px; object-fit: cover; border: 3px solid #004085; border-radius: 10px; shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #previewContainer { display: none; text-align: center; margin-top: 15px; border: 2px dashed #004085; padding: 10px; border-radius: 10px; }
+        #imagePreview { width: 100px; height: 133px; object-fit: cover; border-radius: 5px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         
-        .btn-submit { 
-            background: #004085; border: none; padding: 15px; font-weight: bold; 
-            border-radius: 12px; font-size: 1.1rem; margin-top: 25px; transition: 0.3s;
-        }
-        .btn-submit:active { transform: scale(0.98); background: #002752; }
+        .btn-submit { background: #28a745; border: none; padding: 15px; font-weight: bold; border-radius: 10px; width: 100%; color: white; margin-top: 20px; font-size: 1.1rem; }
+        .btn-submit:disabled { background: #ccc; }
     </style>
 </head>
 <body>
@@ -46,89 +48,87 @@
         <div class="header-box">
             <h5>THÔNG TIN HỌC VIÊN<br>AN TOÀN ĐIỆN VSIP 2026</h5>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body p-3">
             <form id="studentForm">
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Họ và Tên (Viết HOA)</label>
-                    <input type="text" id="fullName" class="form-control text-uppercase" placeholder="NGUYỄN MINH HÒA" required>
+                    <input type="text" id="fullName" class="form-control text-uppercase" placeholder="NGUYỄN VĂN A" required>
                 </div>
 
-                <div class="row">
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Phòng</label>
-                        <select id="dept" class="form-select" required>
-                            <option value="">--Chọn--</option>
-                            <option value="M&E">M&E</option><option value="PP">PP</option>
-                            <option value="W&S">W&S</option><option value="EMD">EMD</option>
-                            <option value="CON">CON</option><option value="SHEC">SHEC</option>
-                        </select>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Bậc</label>
-                        <select id="level" class="form-select" required>
-                            <option value="">--Chọn--</option>
-                            <option value="1/5">1/5</option><option value="2/5">2/5</option>
-                            <option value="3/5">3/5</option><option value="4/5">4/5</option>
-                            <option value="5/5">5/5</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Phòng</label>
+                    <select id="dept" class="form-select" required>
+                        <option value="">-- Chọn Phòng --</option>
+                        <option value="M&E">M&E</option><option value="PP">PP</option>
+                        <option value="W&S">W&S</option><option value="EMD">EMD</option>
+                        <option value="CON">CON</option><option value="SHEC">SHEC</option>
+                    </select>
                 </div>
 
-                <div class="row">
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Ngày sinh</label>
-                        <input type="date" id="dob" class="form-control" required>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Số CCCD</label>
-                        <input type="tel" id="idCard" class="form-control" pattern="\d{12}" maxlength="12" placeholder="12 chữ số" required>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Bậc</label>
+                    <select id="level" class="form-select" required>
+                        <option value="">-- Chọn Bậc --</option>
+                        <option value="1/5">1/5</option><option value="2/5">2/5</option>
+                        <option value="3/5">3/5</option><option value="4/5">4/5</option>
+                        <option value="5/5">5/5</option>
+                    </select>
                 </div>
 
-                <div class="mb-3">
+                <div class="form-group">
+                    <label class="form-label">Ngày sinh</label>
+                    <input type="date" id="dob" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Số CCCD (12 số)</label>
+                    <input type="tel" id="idCard" class="form-control" maxlength="12" placeholder="Nhập đủ 12 chữ số" required>
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Chức vụ / Công việc</label>
-                    <input type="text" id="job" class="form-control" placeholder="Ví dụ: Nhân viên kỹ thuật" required>
+                    <input type="text" id="job" class="form-control" placeholder="Ví dụ: Kỹ thuật viên" required>
                 </div>
 
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label text-danger">Hình thẻ 3x4</label>
-                    <div class="file-input-wrapper" onclick="document.getElementById('photo').click()">
-                        <div class="btn-file">
-                            <i class="fa-solid fa-camera"></i>
-                            CHỤP ẢNH HOẶC CHỌN FILE
+                    <div class="photo-actions">
+                        <div class="btn-photo btn-capture" onclick="document.getElementById('photoCap').click()">
+                            <i class="fa-solid fa-camera fa-lg"></i> CHỤP ẢNH
                         </div>
-                        <input type="file" id="photo" accept="image/*" capture="user" style="display:none" onchange="previewImage(this)" required>
+                        <div class="btn-photo btn-browse" onclick="document.getElementById('photoFile').click()">
+                            <i class="fa-solid fa-image fa-lg"></i> CHỌN FILE
+                        </div>
                     </div>
+                    <input type="file" id="photoCap" accept="image/*" capture="user" style="display:none" onchange="handleFile(this)">
+                    <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="handleFile(this)">
                 </div>
 
                 <div id="previewContainer">
-                    <img id="imagePreview" src="#" alt="Hình thẻ">
-                    <p class="text-muted small mt-2">Vuốt lên để kiểm tra thông tin trước khi gửi</p>
+                    <img id="imagePreview" src="#" alt="Preview">
+                    <p class="small text-muted mt-1">Ảnh đã được chọn</p>
                 </div>
 
-                <button type="button" onclick="sendData()" id="btnSubmit" class="btn btn-primary btn-submit w-100 shadow text-white">
-                    GỬI THÔNG TIN VỀ VDC
-                </button>
+                <button type="button" onclick="sendData()" id="btnSubmit" class="btn btn-submit shadow">GỬI THÔNG TIN VỀ VDC</button>
             </form>
             <div id="status" class="mt-3 text-center fw-bold"></div>
         </div>
     </div>
-    <p class="text-center mt-4 text-muted small">Quản lý bởi VDC - 2026</p>
+    <p class="text-center mt-3 text-muted" style="font-size: 0.7rem;">VDC Safety Training &copy; 2026</p>
 </div>
 
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz_WiyNUAcAo1O2lj4ITS5mcWFRkNEeYU6gC9n1YKf2l4O58hL-uhIThF2Mi1nZh2njkg/exec";
+    let selectedImageData = null;
 
-    function previewImage(input) {
-        const preview = document.getElementById('imagePreview');
-        const container = document.getElementById('previewContainer');
+    function handleFile(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                preview.src = e.target.result;
-                container.style.display = 'block';
-                // Tự động cuộn xuống để thấy ảnh
-                container.scrollIntoView({ behavior: 'smooth' });
+                selectedImageData = e.target.result;
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('previewContainer').style.display = 'block';
+                document.getElementById('previewContainer').scrollIntoView({ behavior: 'smooth' });
             }
             reader.readAsDataURL(input.files[0]);
         }
@@ -140,41 +140,41 @@
         const btn = document.getElementById('btnSubmit');
         const status = document.getElementById('status');
 
-        if (!form.checkValidity()) { form.reportValidity(); return; }
+        if (!form.checkValidity() || !selectedImageData) {
+            alert("Vui lòng điền đủ thông tin và chọn/chụp hình thẻ!");
+            form.reportValidity();
+            return;
+        }
         if (idCard.length !== 12) { alert("Số CCCD phải đủ 12 chữ số!"); return; }
 
         btn.disabled = true;
-        status.innerHTML = "<div class='spinner-border spinner-border-sm text-primary'></div> Đang gửi dữ liệu...";
+        status.innerHTML = "Đang gửi dữ liệu...";
 
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            const payload = {
-                fullName: document.getElementById('fullName').value.toUpperCase(),
-                department: document.getElementById('dept').value,
-                level: document.getElementById('level').value,
-                dob: document.getElementById('dob').value.split('-').reverse().join('/'),
-                idCard: idCard,
-                jobTitle: document.getElementById('job').value,
-                image: e.target.result
-            };
-
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-                status.innerHTML = "<span class='text-success'>✓ Đã gửi thành công!</span>";
-                form.reset();
-                document.getElementById('previewContainer').style.display = 'none';
-                window.scrollTo(0,0);
-            } catch (error) {
-                status.innerHTML = "<span class='text-danger'>Lỗi kết nối. Hãy thử lại!</span>";
-            }
-            btn.disabled = false;
+        const payload = {
+            fullName: document.getElementById('fullName').value.toUpperCase(),
+            department: document.getElementById('dept').value,
+            level: document.getElementById('level').value,
+            dob: document.getElementById('dob').value.split('-').reverse().join('/'),
+            idCard: idCard,
+            jobTitle: document.getElementById('job').value,
+            image: selectedImageData
         };
-        reader.readAsDataURL(document.getElementById('photo').files[0]);
+
+        try {
+            await fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            status.innerHTML = "<span class='text-success'>✓ Gửi thành công! Cảm ơn bạn.</span>";
+            form.reset();
+            document.getElementById('previewContainer').style.display = 'none';
+            selectedImageData = null;
+        } catch (error) {
+            status.innerHTML = "<span class='text-danger'>Lỗi. Vui lòng thử lại!</span>";
+        }
+        btn.disabled = false;
     }
 </script>
 </body>
