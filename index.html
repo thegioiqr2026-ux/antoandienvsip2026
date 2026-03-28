@@ -1,31 +1,200 @@
-function lookupName() {
-  const name = document.getElementById('fullName').value.trim();
-  if (!name) return;
-  
-  document.getElementById('spin').style.display = 'inline-block';
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THÔNG TIN HỌC VIÊN AN TOÀN ĐIỆN VSIP 2026</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f0f2f5; padding: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .container { max-width: 650px; }
+        .card { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .header-box { background: #004085; color: white; padding: 25px; text-align: center; }
+        .header-box h5 { font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+        .form-label { font-weight: 600; color: #333; margin-top: 10px; }
+        .btn-submit { background: #004085; border: none; font-weight: bold; padding: 15px; transition: 0.3s; }
+        .btn-submit:hover { background: #002752; transform: translateY(-2px); }
+        .found-box { background: #d4edda; border-left: 5px solid #28a745; padding: 12px; border-radius: 5px; display: none; margin-bottom: 20px; font-size: 0.9rem; color: #155724; }
+        #spin { display: none; }
+    </style>
+</head>
+<body>
 
-  // Tạo lời gọi JSONP
-  const script = document.createElement('script');
-  const callbackName = 'vdcCallback_' + Math.round(Math.random() * 1000000);
-  
-  window[callbackName] = function(res) {
-    document.getElementById('spin').style.display = 'none';
-    if (res.exists) {
-      studentInfo = { isUpdate: true, row: res.row };
-      document.getElementById('foundMsg').style.display = 'block';
-      document.getElementById('room').value = res.room || "";
-      document.getElementById('level').value = res.level || "";
-    } else {
-      studentInfo = { isUpdate: false, row: null };
-      document.getElementById('foundMsg').style.display = 'none';
-      if (!confirm("Họ tên này không có trong danh sách. Bạn xác nhận nhập đúng?")) {
-        document.getElementById('fullName').value = "";
-      }
+<div class="container">
+    <div class="card mt-3">
+        <div class="header-box">
+            <h5>Thông Tin Học Viên<br>Lớp An Toàn Điện VSIP 2026</h5>
+        </div>
+        <div class="card-body p-4">
+            <div id="foundMsg" class="found-box">
+                <strong>✓ Đã tìm thấy tên!</strong> Hệ thống đã tự động điền <b>Phòng</b> và <b>Bậc</b> của bạn. Vui lòng kiểm tra lại các mục khác.
+            </div>
+
+            <form id="studentForm">
+                <div class="mb-3">
+                    <label class="form-label">Họ và Tên (Viết HOA có dấu)</label>
+                    <div class="input-group">
+                        <input type="text" id="fullName" class="form-control text-uppercase" placeholder="NGUYỄN MINH HÒA" required onblur="lookupName()">
+                        <div class="input-group-text">
+                            <div id="spin" class="spinner-border spinner-border-sm text-primary"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Bộ phận</label>
+                        <select id="dept" class="form-select" required>
+                            <option value="">-- Chọn --</option>
+                            <option value="M&E">M&E</option>
+                            <option value="PP">PP</option>
+                            <option value="W&S">W&S</option>
+                            <option value="EMD">EMD</option>
+                            <option value="CON">CON</option>
+                            <option value="SHEC">SHEC</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phòng</label>
+                        <input type="text" id="room" class="form-control" placeholder="Tên phòng" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Bậc</label>
+                        <select id="level" class="form-select" required>
+                            <option value="">-- Chọn --</option>
+                            <option value="1/5">1/5</option>
+                            <option value="2/5">2/5</option>
+                            <option value="3/5">3/5</option>
+                            <option value="4/5">4/5</option>
+                            <option value="5/5">5/5</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Ngày sinh</label>
+                        <input type="date" id="dob" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Số CMND/CCCD</label>
+                        <input type="text" id="idCard" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Chức vụ/ Công việc</label>
+                        <input type="text" id="job" class="form-control" placeholder="Vd: Nhân viên vận hành" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-danger">Hình thẻ 3x4 (Chụp rõ mặt, nền xanh/trắng)</label>
+                    <input type="file" id="photo" accept="image/*" class="form-control" required>
+                </div>
+
+                <button type="button" onclick="sendData()" id="btnSubmit" class="btn btn-primary btn-submit w-100 shadow-sm text-white">
+                    GỬI THÔNG TIN VỀ VDC
+                </button>
+            </form>
+            <div id="status" class="mt-3 text-center fw-bold"></div>
+        </div>
+    </div>
+    <p class="text-center mt-4 text-muted small">Hệ thống quản lý đào tạo an toàn điện VDC &copy; 2026</p>
+</div>
+
+<script>
+    // --- THIẾT LẬP LINK WEB APP CỦA BẠN ---
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz_WiyNUAcAo1O2lj4ITS5mcWFRkNEeYU6gC9n1YKf2l4O58hL-uhIThF2Mi1nZh2njkg/exec";
+
+    let studentInfo = { isUpdate: false, row: null };
+
+    // 1. Hàm tra cứu tên học viên
+    async function lookupName() {
+        const nameInput = document.getElementById('fullName');
+        const name = nameInput.value.trim();
+        if (!name) return;
+        
+        document.getElementById('spin').style.display = 'block';
+
+        try {
+            const response = await fetch(`${WEB_APP_URL}?action=lookup&fullName=${encodeURIComponent(name)}`);
+            const res = await response.json();
+
+            document.getElementById('spin').style.display = 'none';
+            if (res.exists) {
+                studentInfo = { isUpdate: true, row: res.row };
+                document.getElementById('foundMsg').style.display = 'block';
+                document.getElementById('room').value = res.room || "";
+                document.getElementById('level').value = res.level || "";
+            } else {
+                studentInfo = { isUpdate: false, row: null };
+                document.getElementById('foundMsg').style.display = 'none';
+                if (!confirm("Họ tên này không có trong danh sách gốc. Bạn có chắc chắn nhập đúng không?")) {
+                    nameInput.value = "";
+                }
+            }
+        } catch (error) {
+            document.getElementById('spin').style.display = 'none';
+            console.error("Lỗi tra cứu:", error);
+        }
     }
-    document.body.removeChild(script);
-    delete window[callbackName];
-  };
 
-  script.src = `${WEB_APP_URL}?action=lookup&fullName=${encodeURIComponent(name)}&callback=${callbackName}`;
-  document.body.appendChild(script);
-}
+    // 2. Hàm gửi dữ liệu lên Google Sheets & Drive
+    function sendData() {
+        const fileInput = document.getElementById('photo');
+        const file = fileInput.files[0];
+        if (!file) { alert("Vui lòng chọn ảnh thẻ 3x4!"); return; }
+
+        // Kiểm tra các trường bắt buộc
+        const form = document.getElementById('studentForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const btn = document.getElementById('btnSubmit');
+        const status = document.getElementById('status');
+        btn.disabled = true;
+        status.innerHTML = "<span class='text-primary'>Đang xử lý dữ liệu và ảnh... Vui lòng đợi.</span>";
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const payload = {
+                fullName: document.getElementById('fullName').value.toUpperCase(),
+                department: document.getElementById('dept').value,
+                room: document.getElementById('room').value,
+                level: document.getElementById('level').value,
+                dob: document.getElementById('dob').value,
+                idCard: document.getElementById('idCard').value,
+                jobTitle: document.getElementById('job').value,
+                image: e.target.result,
+                isUpdate: studentInfo.isUpdate,
+                rowNumber: studentInfo.row
+            };
+
+            try {
+                // Gửi qua POST - mode no-cors để tránh lỗi bảo mật GitHub
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                status.innerHTML = "<span class='text-success'>✓ Gửi thông tin thành công! Cảm ơn bạn.</span>";
+                form.reset();
+                document.getElementById('foundMsg').style.display = 'none';
+            } catch (error) {
+                status.innerHTML = "<span class='text-danger'>Có lỗi xảy ra. Vui lòng thử lại sau.</span>";
+                console.error("Lỗi gửi dữ liệu:", error);
+            }
+            btn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+
+</body>
+</html>
